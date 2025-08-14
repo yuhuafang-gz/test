@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>愈花房 | 体质测试</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            wood: '#8BC34A',    // 木型
+            fire: '#FF5722',    // 火型
+            earth: '#FFC107',   // 土型
+            metal: '#9E9E9E',   // 金型
+            water: '#2196F3',   // 水型
+            primary: '#F8BBD0',
+            secondary: '#C2185B'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .step-active { @apply text-secondary border-secondary bg-primary/10; }
+      .btn-primary { @apply bg-secondary text-white py-3 rounded-full font-medium transition-all duration-300; }
+      .btn-primary:hover { @apply shadow-lg transform scale-[1.02]; }
+      .quiz-option { @apply w-full p-4 rounded-lg border border-gray-200 text-left mb-2 
+        hover:border-primary transition-all cursor-pointer; }
+      .quiz-option.selected { @apply border-secondary bg-primary/10 font-medium; }
+      .product-highlight { @apply border-secondary/50 bg-secondary/5 relative; }
+      .product-tag { @apply absolute -top-2 -right-2 bg-secondary text-white text-xs px-2 py-0.5 rounded-full shadow-sm; }
+      .element-badge { @apply inline-block px-2 py-1 rounded-full text-xs font-medium; }
+    }
+  </style>
+</head>
+
+<body class="bg-pink-50 min-h-screen font-sans text-gray-800">
+  <div class="container mx-auto px-4 py-6 max-w-md">
+    <!-- 品牌区域 -->
+    <header class="text-center mb-6">
+      <img id="brand-logo" src="https://s21.ax1x.com/2025/08/13/pVwG2As.png" alt="愈花房logo" class="w-16 h-16 rounded-full mx-auto mb-3 border-2 border-primary bg-white shadow-sm">
+      <h1 class="text-[clamp(1.5rem,5vw,2rem)] font-bold text-secondary">愈花房</h1>
+      <p class="text-gray-600 text-sm">好喝 健康 无添加</p>
+    </header>
+
+    <!-- 步骤指示器 -->
+    <div class="flex justify-between items-center mb-8 px-1">
+      <div class="flex flex-col items-center w-1/3">
+        <div id="step1-indicator" class="w-10 h-10 rounded-full border-2 flex items-center justify-center step-active mb-1">
+          <i class="fa fa-calendar text-secondary"></i>
+        </div>
+        <span class="text-xs text-center">生日</span>
+      </div>
+      <div class="w-1/3 h-0.5 bg-gray-200 relative">
+        <div id="progress-1-2" class="absolute left-0 top-0 h-full bg-primary w-0 transition-all duration-500"></div>
+      </div>
+      <div class="flex flex-col items-center w-1/3">
+        <div id="step2-indicator" class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 mb-1">
+          <i class="fa fa-question-circle"></i>
+        </div>
+        <span class="text-xs text-center text-gray-500">体质测试</span>
+      </div>
+      <div class="w-1/3 h-0.5 bg-gray-200 relative">
+        <div id="progress-2-3" class="absolute left-0 top-0 h-full bg-primary w-0 transition-all duration-500"></div>
+      </div>
+      <div class="flex flex-col items-center w-1/3">
+        <div id="step3-indicator" class="w-10 h-10 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400 mb-1">
+          <i class="fa fa-leaf"></i>
+        </div>
+        <span class="text-xs text-center text-gray-500">推荐方案</span>
+      </div>
+    </div>
+
+    <!-- 步骤1：生日输入 -->
+    <section id="step1" class="bg-white rounded-2xl p-6 shadow-md mb-6 transform transition-all duration-300">
+      <h2 class="text-lg font-medium text-gray-800 mb-5">请输入您的生日</h2>
+      
+      <div class="flex gap-2 mb-5">
+        <button id="solar-calendar" class="flex-1 py-2 text-sm font-medium rounded-md bg-secondary text-white">公历</button>
+        <button id="lunar-calendar" class="flex-1 py-2 text-sm font-medium rounded-md bg-gray-100 text-gray-600">农历</button>
+      </div>
+      
+      <div class="grid grid-cols-3 gap-3 mb-6">
+        <div class="relative">
+          <select id="birth-year" class="w-full px-3 py-3 rounded-lg border border-gray-200 appearance-none 
+            focus:border-secondary focus:ring-2 focus:ring-primary/30 outline-none text-sm">
+            <!-- 动态生成年份 -->
+          </select>
+          <i class="fa fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+        </div>
+        
+        <div class="relative">
+          <select id="birth-month" class="w-full px-3 py-3 rounded-lg border border-gray-200 appearance-none 
+            focus:border-secondary focus:ring-2 focus:ring-primary/30 outline-none text-sm">
+            <!-- 动态生成月份 -->
+          </select>
+          <i class="fa fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+        </div>
+        
+        <div class="relative">
+          <select id="birth-day" class="w-full px-3 py-3 rounded-lg border border-gray-200 appearance-none 
+            focus:border-secondary focus:ring-2 focus:ring-primary/30 outline-none text-sm">
+            <!-- 动态生成日期 -->
+          </select>
+          <i class="fa fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+        </div>
+      </div>
+      
+      <p class="text-gray-400 text-xs text-center mb-6">生日信息将帮助我们更精准地分析您的体质特征</p>
+      
+      <button id="to-step2" class="w-full btn-primary">
+        开始体质测试 <i class="fa fa-arrow-right ml-1"></i>
+      </button>
+    </section>
+
+    <!-- 步骤2：体质测试 -->
+    <section id="step2" class="bg-white rounded-2xl p-6 shadow-md mb-6 hidden transform transition-all duration-300">
+      <div class="flex justify-between items-center mb-5">
+        <h2 class="text-lg font-medium text-gray-800">体质特征测试</h2>
+        <span id="quiz-progress" class="px-2 py-1 bg-primary/10 text-secondary text-xs rounded-full">1/5</span>
+      </div>
+      
+      <div id="quiz-container">
+        <!-- 题1：身体状态 -->
+        <div class="quiz-question active">
+          <p class="text-gray-700 mb-4">1. 您的身体状态跟以下描述更接近的是？</p>
+          <div class="space-y-2">
+            <div class="quiz-option" data-type="fire">怕热，容易口干舌燥，喜欢冷饮</div>
+            <div class="quiz-option" data-type="water">怕冷，手脚易凉，喜欢热饮</div>
+            <div class="quiz-option" data-type="earth">身体易沉重，皮肤易出油，大便易黏滞</div>
+            <div class="quiz-option" data-type="metal">皮肤易干燥，情绪易紧张，易疲劳</div>
+            <div class="quiz-option" data-type="wood">精力充沛，适应力强，不易生病</div>
+          </div>
+        </div>
+        
+        <!-- 题2：舌苔状态 -->
+        <div class="quiz-question hidden">
+          <p class="text-gray-700 mb-4">2. 您的舌苔更接近哪种状态？</p>
+          <div class="space-y-2">
+            <div class="quiz-option" data-type="fire">舌苔偏黄，口干有苦味</div>
+            <div class="quiz-option" data-type="water">舌苔白厚，口腔黏腻</div>
+            <div class="quiz-option" data-type="earth">舌苔厚腻，有时发黄</div>
+            <div class="quiz-option" data-type="metal">舌苔薄白，口唇偏干</div>
+            <div class="quiz-option" data-type="wood">舌苔薄白，口腔清爽</div>
+          </div>
+        </div>
+        
+        <!-- 题3：大便情况 -->
+        <div class="quiz-question hidden">
+          <p class="text-gray-700 mb-4">3. 您的大便状态通常是？</p>
+          <div class="space-y-2">
+            <div class="quiz-option" data-type="fire">偏干硬，容易便秘</div>
+            <div class="quiz-option" data-type="water">偏稀溏，容易腹泻</div>
+            <div class="quiz-option" data-type="earth">黏腻不成形，粘马桶</div>
+            <div class="quiz-option" data-type="metal">干燥但成形，排便规律</div>
+            <div class="quiz-option" data-type="wood">软硬适中，排便顺畅</div>
+          </div>
+        </div>
+        
+        <!-- 题4：情绪特点 -->
+        <div class="quiz-question hidden">
+          <p class="text-gray-700 mb-4">4. 您的情绪特点更接近？</p>
+          <div class="space-y-2">
+            <div class="quiz-option" data-type="fire">容易烦躁，情绪来得快</div>
+            <div class="quiz-option" data-type="water">比较敏感，容易多愁善感</div>
+            <div class="quiz-option" data-type="earth">情绪稳定，性格随和</div>
+            <div class="quiz-option" data-type="metal">比较内敛，容易感到压力</div>
+            <div class="quiz-option" data-type="wood">积极乐观，情绪平稳</div>
+          </div>
+        </div>
+        
+        <!-- 题5：饮食偏好 -->
+        <div class="quiz-question hidden">
+          <p class="text-gray-700 mb-4">5. 您的饮食偏好是？</p>
+          <div class="space-y-2">
+            <div class="quiz-option" data-type="fire">喜欢辛辣、口味重的食物</div>
+            <div class="quiz-option" data-type="water">喜欢甜食、温热的食物</div>
+            <div class="quiz-option" data-type="earth">不挑食，喜欢各种口味</div>
+            <div class="quiz-option" data-type="metal">喜欢清淡、酸甜的食物</div>
+            <div class="quiz-option" data-type="wood">喜欢蔬菜、五谷类食物</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex gap-3 mt-8">
+        <button id="prev-question" class="flex-1 py-3 border border-gray-200 text-gray-600 rounded-full text-sm font-medium hidden">
+          <i class="fa fa-arrow-left mr-1"></i> 上一题
+        </button>
+        <button id="next-question" class="flex-1 btn-primary">
+          下一题 <i class="fa fa-arrow-right ml-1"></i>
+        </button>
+        <button id="to-step3" class="flex-1 btn-primary hidden">
+          查看推荐方案 <i class="fa fa-check ml-1"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- 步骤3：推荐结果 -->
+    <section id="step3" class="bg-white rounded-2xl p-6 shadow-md mb-6 hidden transform transition-all duration-300">
+      <button id="restart" class="flex items-center text-gray-600 text-sm mb-5 hover:text-secondary transition-colors">
+        <i class="fa fa-refresh mr-1"></i> 重新测试
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="flex justify-center gap-2 mb-3">
+          <div id="element-badge" class="element-badge"></div>
+          <div id="result-type-badge" class="element-badge bg-gray-200 text-gray-700">体质分析</div>
+        </div>
+        <h2 class="text-lg font-bold text-secondary mb-1" id="five-elements-title">您的专属体质方案（[五行类型]）</h2>
+        <p id="birth-info" class="text-gray-500 text-xs"></p>
+      </div>
+
+      <div class="mb-6 p-5 bg-primary/10 rounded-xl border border-primary/20 text-center">
+        <div id="result-icon" class="text-4xl mb-3"></div>
+        <h3 id="nine-types-name" class="text-lg font-bold mb-2">九种体质名称</h3>
+        <p id="result-desc" class="text-gray-600 text-sm">根据您的生日和体质特征综合分析</p>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="flex items-center text-gray-700 text-sm mb-4">
+          <i class="fa fa-leaf text-green-500 mr-1"></i> 推荐花茶
+        </h3>
+        <div id="teas-container" class="grid grid-cols-2 gap-3">
+          <!-- 动态生成花茶卡片 -->
+        </div>
+      </div>
+
+      <div class="p-4 bg-white rounded-xl border border-gray-100 mb-6">
+        <h3 class="flex items-center text-gray-700 text-sm mb-3">
+          <i class="fa fa-info-circle text-secondary mr-1"></i> 体质调理建议
+        </h3>
+        <ul id="advice-list" class="space-y-2 text-gray-600 text-sm">
+          <!-- 动态生成建议 -->
+        </ul>
+      </div>
+
+      <!-- 小程序跳转按钮（已更新为指定路径和文字） -->
+      <div class="text-center">
+        <a href="weixin://dl/business/?t=gh_6c3fc6f903b0&path=/yb_wm/index/index" class="block w-full py-3 bg-secondary/10 text-secondary rounded-full text-sm font-medium hover:bg-secondary/20 transition-colors">
+          领取免费试饮一杯 <i class="fa fa-arrow-right ml-1"></i>
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // 农历月份名称
+    const lunarMonths = ['正月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '冬月', '腊月'];
+    
+    // 五行类型与九种体质对应关系
+    const 五行与九种体质对应 = {
+      wood: {
+        五行名称: "木型",
+        九种体质: "平和质",
+        九种体质描述: "身体状态稳定，阴阳平衡，是理想的体质状态，适应力强"
+      },
+      fire: {
+        五行名称: "火型",
+        九种体质: "阴虚质",
+        九种体质描述: "易怕热，口干舌燥，手脚心热，需注意清热滋阴"
+      },
+      earth: {
+        五行名称: "土型",
+        九种体质: "痰湿质",
+        九种体质描述: "身体易沉重，皮肤易出油，大便易黏滞，需注意祛湿化痰"
+      },
+      metal: {
+        五行名称: "金型",
+        九种体质: "气虚质",
+        九种体质描述: "易疲劳，抵抗力较弱，皮肤易干燥，需注意补气滋润"
+      },
+      water: {
+        五行名称: "水型",
+        九种体质: "阳虚质",
+        九种体质描述: "易怕冷，手脚冰凉，喜欢热饮，需注意温补散寒"
+      }
+    };
+    
+    // 体质数据
+    const constitutionData = {
+      wood: {
+        name: "木型",
+        color: "wood",
+        icon: '<i class="fa fa-leaf text-wood"></i>',
+        badge: "木型",
+        teas: [
+          {name: "玫瑰红枣桂圆茶", desc: "墨红玫瑰+红枣+桂圆，补气血养颜", isProduct: true},
+          {name: "枸杞菊花茶", desc: "枸杞+菊花，养肝明目", isProduct: false},
+          {name: "茉莉薄荷茶", desc: "茉莉花+薄荷，提神醒脑", isProduct: false},
+          {name: "陈皮山楂茶", desc: "陈皮+山楂，健脾开胃", isProduct: false}
+        ],
+        advice: [
+          "保持规律作息，维持良好状态",
+          "适当进行户外活动，如散步、瑜伽",
+          "饮食均衡，多吃新鲜蔬果"
+        ]
+      },
+      fire: {
+        name: "火型",
+        color: "fire",
+        icon: '<i class="fa fa-fire text-fire"></i>',
+        badge: "火型",
+        teas: [
+          {name: "菊花金银花雪梨茶", desc: "金丝皇菊+金银花+雪梨，清热降火", isProduct: true},
+          {name: "薄荷芦根茶", desc: "薄荷+芦根，清凉解暑", isProduct: false},
+          {name: "绿豆百合茶", desc: "绿豆+百合，清心安神", isProduct: false},
+          {name: "荷叶冬瓜茶", desc: "荷叶+冬瓜，清热利湿", isProduct: false}
+        ],
+        advice: [
+          "少吃辛辣、油炸食物，避免上火",
+          "夏季注意防暑降温，多补充水分",
+          "保持情绪稳定，避免过度激动"
+        ]
+      },
+      earth: {
+        name: "土型",
+        color: "earth",
+        icon: '<i class="fa fa-globe text-earth"></i>',
+        badge: "土型",
+        teas: [
+          {name: "玫瑰山楂茯苓茶", desc: "平阴玫瑰+山楂+茯苓，祛湿排浊", isProduct: true},
+          {name: "炒米陈皮茶", desc: "炒米+陈皮，健脾和胃", isProduct: false},
+          {name: "山药莲子茶", desc: "山药+莲子，益气健脾", isProduct: false},
+          {name: "生姜红枣茶", desc: "生姜+红枣，温胃散寒", isProduct: false}
+        ],
+        advice: [
+          "避免潮湿环境，雨季注意防潮",
+          "饮食清淡，避免过多油腻食物",
+          "适当运动，促进身体循环代谢"
+        ]
+      },
+      metal: {
+        name: "金型",
+        color: "metal",
+        icon: '<i class="fa fa-diamond text-metal"></i>',
+        badge: "金型",
+        teas: [
+          {name: "金盏菊枸杞茶", desc: "金盏菊+杭白菊+枸杞，清肝焕亮", isProduct: true},
+          {name: "麦冬玉竹茶", desc: "麦冬+玉竹，滋阴润燥", isProduct: false},
+          {name: "银耳百合茶", desc: "银耳+百合，润肺止咳", isProduct: false},
+          {name: "桑杏茶", desc: "桑叶+杏仁，清肺润燥", isProduct: false}
+        ],
+        advice: [
+          "保持环境湿润，避免干燥刺激",
+          "多喝水，多食滋润性食物",
+          "注意情绪调节，避免过度压力"
+        ]
+      },
+      water: {
+        name: "水型",
+        color: "water",
+        icon: '<i class="fa fa-tint text-water"></i>',
+        badge: "水型",
+        teas: [
+          {name: "玫瑰肉桂姜茶", desc: "金边玫瑰+肉桂+小黄姜，暖宫驱寒", isProduct: true},
+          {name: "桂圆红枣茶", desc: "桂圆+红枣，温补气血", isProduct: false},
+          {name: "核桃枸杞茶", desc: "核桃+枸杞，补肾益精", isProduct: false},
+          {name: "艾叶红糖茶", desc: "艾叶+红糖，温经散寒", isProduct: false}
+        ],
+        advice: [
+          "注意保暖，尤其是腹部和脚部",
+          "少吃生冷食物，多喝温热饮品",
+          "适当进行温和运动，如慢跑、太极拳"
+        ]
+      }
+    };
+
+    // DOM元素与初始化逻辑
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const toStep2 = document.getElementById('to-step2');
+    const toStep3 = document.getElementById('to-step3');
+    const restart = document.getElementById('restart');
+    const yearSel = document.getElementById('birth-year');
+    const monthSel = document.getElementById('birth-month');
+    const daySel = document.getElementById('birth-day');
+    const solarCalendar = document.getElementById('solar-calendar');
+    const lunarCalendar = document.getElementById('lunar-calendar');
+    const quizOptions = document.querySelectorAll('.quiz-option');
+    const quizQuestions = document.querySelectorAll('.quiz-question');
+    const prevQuestion = document.getElementById('prev-question');
+    const nextQuestion = document.getElementById('next-question');
+    const quizProgress = document.getElementById('quiz-progress');
+    const progress12 = document.getElementById('progress-1-2');
+    const progress23 = document.getElementById('progress-2-3');
+    const step1Indicator = document.getElementById('step1-indicator');
+    const step2Indicator = document.getElementById('step2-indicator');
+    const step3Indicator = document.getElementById('step3-indicator');
+
+    let currentQuestion = 0;
+    const totalQuestions = quizQuestions.length;
+    const quizScores = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
+    let userBirthinfo = { 
+      year: 1995, month: 6, day: 15, type: 'solar'
+    };
+
+    function initBirthSelect() {
+      const currentYear = new Date().getFullYear();
+      for (let y = currentYear; y >= currentYear - 70; y--) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        yearSel.appendChild(opt);
+      }
+      yearSel.value = userBirthinfo.year;
+      
+      generateMonths('solar');
+      updateDays(userBirthinfo.year, userBirthinfo.month);
+      daySel.value = userBirthinfo.day;
+      
+      yearSel.addEventListener('change', () => {
+        userBirthinfo.year = parseInt(yearSel.value);
+        updateDays(userBirthinfo.year, userBirthinfo.month);
+      });
+      
+      monthSel.addEventListener('change', () => {
+        userBirthinfo.month = userBirthinfo.type === 'solar' 
+          ? parseInt(monthSel.value) 
+          : (Array.from(monthSel.options).indexOf(monthSel.selectedOptions[0]) + 1);
+        updateDays(userBirthinfo.year, userBirthinfo.month);
+      });
+      
+      daySel.addEventListener('change', () => {
+        userBirthinfo.day = parseInt(daySel.value);
+      });
+      
+      solarCalendar.addEventListener('click', () => {
+        userBirthinfo.type = 'solar';
+        solarCalendar.classList.remove('bg-gray-100', 'text-gray-600');
+        solarCalendar.classList.add('bg-secondary', 'text-white');
+        lunarCalendar.classList.remove('bg-secondary', 'text-white');
+        lunarCalendar.classList.add('bg-gray-100', 'text-gray-600');
+        generateMonths('solar');
+        updateDays(userBirthinfo.year, userBirthinfo.month);
+      });
+      
+      lunarCalendar.addEventListener('click', () => {
+        userBirthinfo.type = 'lunar';
+        lunarCalendar.classList.remove('bg-gray-100', 'text-gray-600');
+        lunarCalendar.classList.add('bg-secondary', 'text-white');
+        solarCalendar.classList.remove('bg-secondary', 'text-white');
+        solarCalendar.classList.add('bg-gray-100', 'text-gray-600');
+        generateMonths('lunar');
+        updateDays(userBirthinfo.year, userBirthinfo.month);
+      });
+    }
+
+    function generateMonths(type) {
+      monthSel.innerHTML = '';
+      if (type === 'solar') {
+        for (let m = 1; m <= 12; m++) {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = m;
+          monthSel.appendChild(opt);
+        }
+      } else {
+        lunarMonths.forEach((month, index) => {
+          const opt = document.createElement('option');
+          opt.value = index + 1;
+          opt.textContent = month;
+          monthSel.appendChild(opt);
+        });
+      }
+      monthSel.value = userBirthinfo.month;
+    }
+
+    function updateDays(year, month) {
+      daySel.innerHTML = '';
+      let daysInMonth = 30;
+      
+      if (userBirthinfo.type === 'solar') {
+        if (month === 2) {
+          const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+          daysInMonth = isLeap ? 29 : 28;
+        } else if ([4, 6, 9, 11].includes(month)) {
+          daysInMonth = 30;
+        } else {
+          daysInMonth = 31;
+        }
+      } else {
+        daysInMonth = 30;
+      }
+      
+      for (let d = 1; d <= daysInMonth; d++) {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        daySel.appendChild(opt);
+      }
+    }
+
+    function getBirthConstitution() {
+      const month = userBirthinfo.month;
+      if (month >= 2 && month <= 4) return 'wood';
+      else if (month >= 5 && month <= 7) return 'fire';
+      else if (month >= 8 && month <= 10) return 'earth';
+      else return 'water';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initBirthSelect();
+      addEventListeners();
+    });
+
+    function addEventListeners() {
+      toStep2.addEventListener('click', () => {
+        step1.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          step1.classList.add('hidden');
+          step2.classList.remove('hidden');
+          setTimeout(() => {
+            step2.classList.remove('opacity-0', 'scale-95');
+          }, 50);
+        }, 200);
+        
+        step2Indicator.classList.add('step-active');
+        step2Indicator.classList.remove('border-gray-200', 'text-gray-400');
+        progress12.style.width = '100%';
+      });
+
+      quizOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          const parentQuestion = option.closest('.quiz-question');
+          parentQuestion.querySelectorAll('.quiz-option').forEach(opt => {
+            opt.classList.remove('selected');
+          });
+          option.classList.add('selected');
+        });
+      });
+
+      nextQuestion.addEventListener('click', () => {
+        const currentOptions = quizQuestions[currentQuestion].querySelectorAll('.quiz-option');
+        const isSelected = Array.from(currentOptions).some(opt => opt.classList.contains('selected'));
+        if (!isSelected) {
+          quizQuestions[currentQuestion].classList.add('animate-shake');
+          setTimeout(() => quizQuestions[currentQuestion].classList.remove('animate-shake'), 500);
+          return;
+        }
+
+        const selectedOption = quizQuestions[currentQuestion].querySelector('.selected');
+        const type = selectedOption.dataset.type;
+        quizScores[type]++;
+
+        quizQuestions[currentQuestion].classList.add('hidden');
+        currentQuestion++;
+        quizQuestions[currentQuestion].classList.remove('hidden');
+        quizProgress.textContent = `${currentQuestion + 1}/${totalQuestions}`;
+
+        prevQuestion.classList.remove('hidden');
+
+        if (currentQuestion === totalQuestions - 1) {
+          nextQuestion.classList.add('hidden');
+          toStep3.classList.remove('hidden');
+        }
+      });
+
+      prevQuestion.addEventListener('click', () => {
+        const selectedOption = quizQuestions[currentQuestion].querySelector('.selected');
+        if (selectedOption) {
+          const type = selectedOption.dataset.type;
+          quizScores[type]--;
+        }
+
+        quizQuestions[currentQuestion].classList.add('hidden');
+        currentQuestion--;
+        quizQuestions[currentQuestion].classList.remove('hidden');
+        quizProgress.textContent = `${currentQuestion + 1}/${totalQuestions}`;
+
+        if (currentQuestion === 0) {
+          prevQuestion.classList.add('hidden');
+        }
+
+        nextQuestion.classList.remove('hidden');
+        toStep3.classList.add('hidden');
+      });
+
+      toStep3.addEventListener('click', () => {
+        const selectedOption = quizQuestions[currentQuestion].querySelector('.selected');
+        if (selectedOption) {
+          const type = selectedOption.dataset.type;
+          quizScores[type]++;
+        } else {
+          quizQuestions[currentQuestion].classList.add('animate-shake');
+          setTimeout(() => quizQuestions[currentQuestion].classList.remove('animate-shake'), 500);
+          return;
+        }
+
+        const birthType = getBirthConstitution();
+        quizScores[birthType] += 1;
+        const finalType = Object.keys(quizScores).reduce((a, b) => 
+          quizScores[a] >= quizScores[b] ? a : b
+        );
+
+        step2.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          step2.classList.add('hidden');
+          step3.classList.remove('hidden');
+          setTimeout(() => {
+            step3.classList.remove('opacity-0', 'scale-95');
+          }, 50);
+        }, 200);
+
+        step3Indicator.classList.add('step-active');
+        step3Indicator.classList.remove('border-gray-200', 'text-gray-400');
+        progress23.style.width = '100%';
+
+        showResult(finalType);
+      });
+
+      restart.addEventListener('click', () => {
+        currentQuestion = 0;
+        Object.keys(quizScores).forEach(key => quizScores[key] = 0);
+        quizOptions.forEach(opt => opt.classList.remove('selected'));
+        quizQuestions.forEach((q, i) => {
+          q.classList.add('hidden');
+          if (i === 0) q.classList.remove('hidden');
+        });
+        
+        step3.classList.add('opacity-0', 'scale-95');
+        setTimeout(() => {
+          step3.classList.add('hidden');
+          step1.classList.remove('hidden');
+          setTimeout(() => step1.classList.remove('opacity-0', 'scale-95'), 50);
+        }, 200);
+        
+        step2Indicator.classList.remove('step-active');
+        step3Indicator.classList.remove('step-active');
+        step2Indicator.classList.add('border-gray-200', 'text-gray-400');
+        step3Indicator.classList.add('border-gray-200', 'text-gray-400');
+        progress12.style.width = '0';
+        progress23.style.width = '0';
+        quizProgress.textContent = '1/5';
+        prevQuestion.classList.add('hidden');
+        nextQuestion.classList.remove('hidden');
+        toStep3.classList.add('hidden');
+      });
+    }
+
+    function showResult(type) {
+      const data = constitutionData[type];
+      const 对应关系 = 五行与九种体质对应[type];
+      const calendarType = userBirthinfo.type === 'solar' ? '公历' : '农历';
+      const birthStr = `${calendarType} ${userBirthinfo.year}年${userBirthinfo.month}月${userBirthinfo.day}日`;
+      
+      document.getElementById('element-badge').textContent = 对应关系.五行名称;
+      document.getElementById('element-badge').className = `element-badge bg-${data.color} text-white`;
+      document.getElementById('five-elements-title').textContent = `您的专属体质方案（${对应关系.五行名称}）`;
+      document.getElementById('nine-types-name').textContent = 对应关系.九种体质;
+      document.getElementById('result-desc').textContent = 对应关系.九种体质描述;
+      document.getElementById('birth-info').textContent = `生日：${birthStr}`;
+      document.getElementById('result-icon').innerHTML = data.icon;
+      
+      const teasContainer = document.getElementById('teas-container');
+      teasContainer.innerHTML = '';
+      data.teas.forEach(tea => {
+        const card = document.createElement('div');
+        card.className = `bg-white p-4 rounded-xl border shadow-sm ${tea.isProduct ? 'product-highlight' : 'border-gray-100'}`;
+        card.innerHTML = `
+          ${tea.isProduct ? '<span class="product-tag">推荐</span>' : ''}
+          <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-primary/20 flex items-center justify-center">
+            <i class="fa fa-leaf text-${data.color}"></i>
+          </div>
+          <h4 class="font-medium text-sm mb-1 text-center">${tea.name}</h4>
+          <p class="text-gray-500 text-xs text-center">${tea.desc}</p>
+        `;
+        teasContainer.appendChild(card);
+      });
+      
+      const adviceList = document.getElementById('advice-list');
+      adviceList.innerHTML = '';
+      data.advice.forEach(advice => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2';
+        li.innerHTML = `<i class="fa fa-check-circle text-secondary mt-0.5"></i><span>${advice}</span>`;
+        adviceList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
